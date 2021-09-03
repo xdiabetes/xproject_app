@@ -1,9 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.xproject_app">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
         android:label="xproject_app"
         android:icon="@mipmap/ic_launcher">
-        <activity
+       <!-- Required to fetch data from the internet. -->
+       <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
