@@ -1,4 +1,6 @@
-class OtpSendCodeRequest {
+import 'package:equatable/equatable.dart';
+
+class OtpSendCodeRequest extends Equatable{
   final String phoneNumber;
 
   const OtpSendCodeRequest({
@@ -8,9 +10,15 @@ class OtpSendCodeRequest {
   Map<String, dynamic> toJson() {
     return {'phone_number': phoneNumber};
   }
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [
+    phoneNumber
+  ];
 }
 
-class OtpSendCodeResponse {
+class OtpSendCodeResponse extends Equatable{
   final int pk;
   final DateTime createDate;
   final int queryTimes;
@@ -31,9 +39,18 @@ class OtpSendCodeResponse {
       code: json['code'],
     );
   }
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw [
+    pk,
+    createDate,
+    queryTimes,
+    code
+  ];
 }
 
-class OtpVerifyCodeRequest {
+class OtpVerifyCodeRequest extends Equatable{
   final String phoneNumber;
   final String code;
 
@@ -48,9 +65,16 @@ class OtpVerifyCodeRequest {
       'code': code
     };
   }
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => throw [
+    phoneNumber,
+    code
+  ];
 }
 
-class OtpVerifyCodeResponse {
+class OtpVerifyCodeResponse extends Equatable{
   final int pk;
   final String phoneNumber;
   final String token;
@@ -75,4 +99,12 @@ class OtpVerifyCodeResponse {
       // location: json['location']
     );
   }
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [
+    pk,
+    phoneNumber,
+    token
+  ];
 }
