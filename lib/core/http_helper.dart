@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart';
 
 class HttpHelper {
-  static const apiUrl = 'https://xapp.alimahdiyar.ir/';
+  static late String apiUrl;
   static bool isTypicalHttpSuccess(int statusCode){
     return statusCode == HttpStatus.ok
           || statusCode == HttpStatus.created
