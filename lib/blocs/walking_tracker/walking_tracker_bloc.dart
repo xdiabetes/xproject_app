@@ -40,7 +40,9 @@ class WalkingTrackerBloc extends HydratedBloc<WalkingTrackerEvent, WalkingTracke
       return WalkingTrackerSessionState(
         walkingTrackerSession: walkingTrackerSession,
       );
-    } catch (_) {
+    } catch (err) {
+      print("WalkingTrackerSession fromJson err");
+      print(err);
       return null;
     }
   }

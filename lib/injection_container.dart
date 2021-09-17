@@ -21,8 +21,8 @@ Future<void> init() async {
 
   sl.registerLazySingleton<DeviceLocationService>(() => DeviceLocationServiceImpl());
 
-  sl.registerFactory(() => HealthFactory());
-  sl.registerLazySingleton<HealthApiService>(() => HealthApiServiceImpl(health: sl()));
+  // sl.registerFactory(() => HealthFactory());
+  sl.registerLazySingleton<HealthApiService>(() => HealthApiServiceImpl());
 
   final pedometerService = await PedometerServiceImpl.getInstance();
   sl.registerLazySingleton<PedometerService>(() => pedometerService);

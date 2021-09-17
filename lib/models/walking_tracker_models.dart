@@ -128,19 +128,33 @@ class WalkingTrackerSession extends Equatable{
 
   Map<String, dynamic> toJson() {
     return {
-      'snapshots': this.snapshots,
+      'snapshots': this.snapshots.map((snapshot) => snapshot.toJson()).toList(),
       'pedometerStepsBeforeSession': this.pedometerStepsBeforeSession,
       'createDateTime': this.startDateTime.toIso8601String(),
-      'endDateTime': this.endDateTime,
+      'endDateTime': this.endDateTime != null ? this.endDateTime!.toIso8601String() : null,
     };
   }
 
+  static DateTime? dateTimeFromJson(String? json) {
+    if(json == null) {
+      return null;
+    }
+    if (json.contains(".")) {
+      json = json.substring(0, json.length - 1);
+    }
+    return DateTime.parse(json);
+  }
+
+  static String dateTimeToJson(DateTime json) => json.toIso8601String();
+
   factory WalkingTrackerSession.fromJson(Map<String, dynamic> map) {
     return WalkingTrackerSession(
-      snapshots: map['snapshots'] as List<WalkingSnapshot>,
+      snapshots: (map['snapshots'] as List<dynamic>)
+        .map((snapshotData) => WalkingSnapshot.fromJson(snapshotData))
+        .toList().cast<WalkingSnapshot>(),
       pedometerStepsBeforeSession: map['pedometerStepsBeforeSession'] as int,
-      startDateTime: map['createDateTime'] as DateTime,
-      endDateTime: map['endDateTime'] as DateTime,
+      startDateTime: dateTimeFromJson(map['createDateTime'])!,
+      endDateTime: dateTimeFromJson(map['endDateTime']),
     );
   }
 }

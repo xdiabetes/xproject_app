@@ -1,30 +1,31 @@
 import 'package:health/health.dart';
 
 abstract class HealthApiService {
+  const HealthApiService();
   Future<bool> requestHealthPermission();
   Future<int> getSteps(DateTime fromDate);
 }
 
 class HealthApiServiceImpl extends HealthApiService {
-  HealthFactory health;
-
-  HealthApiServiceImpl({
-    required this.health
-  });
+  const HealthApiServiceImpl();
 
   // define the types to get
   static const List<HealthDataType> types = [
     HealthDataType.STEPS,
+    HealthDataType.WEIGHT,
+    HealthDataType.HEIGHT,
+    HealthDataType.BLOOD_GLUCOSE,
   ];
 
   @override
   Future<bool> requestHealthPermission() async {
+    HealthFactory health = HealthFactory();
     return await health.requestAuthorization(types);
   }
 
 
   @override
-  Future<int> getSteps(DateTime fromDate) async {
+  Future<int> getSteps(DateTime startDate) async {
     // get everything from midnight until now
     DateTime endDate = DateTime.now();
 
@@ -35,10 +36,15 @@ class HealthApiServiceImpl extends HealthApiService {
     int steps = 0;
     List<HealthDataPoint> _healthDataList = [];
 
+    HealthFactory health = HealthFactory();
+
+    // you MUST request access to the data types before reading them
+    bool accessWasGranted = await health.requestAuthorization(types);
+
     try {
       // fetch new data
       List<HealthDataPoint> healthData =
-      await health.getHealthDataFromTypes(fromDate, endDate, types);
+      await health.getHealthDataFromTypes(startDate, endDate, types);
 
       // save all the new data points
       _healthDataList.addAll(healthData);
