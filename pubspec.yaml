@@ -33,12 +33,13 @@ dependencies:
   equatable: ^2.0.3
   flutter_bloc: ^7.2.0
   http: ^0.13.3
-  health: ^3.1.1+1
+  health:
+    path: ../flutter-plugins/packages/health
   pedometer: ^3.0.0
   hydrated_bloc: ^7.0.1
-  location: ^4.3.0
   flutter_dotenv: ^5.0.2
   path_provider: ^2.0.3
+  geolocator: ^7.6.2
 
 dev_dependencies:
   flutter_test:

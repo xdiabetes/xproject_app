@@ -1,11 +1,11 @@
 import 'package:get_it/get_it.dart';
-import 'package:health/health.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xproject_app/blocs/authentication/authentication_bloc.dart';
 import 'package:xproject_app/blocs/otp/otp_bloc.dart';
 import 'package:xproject_app/blocs/walking_tracker/walking_tracker_bloc.dart';
-import 'package:xproject_app/core/device_location_service.dart';
-import 'package:xproject_app/core/health_api_service.dart';
+import 'package:xproject_app/core/device_location/device_location_service.dart';
+import 'package:xproject_app/core/device_location/golocator_lib.dart';
+import 'package:xproject_app/core/google_fit/health_api_service.dart';
 import 'package:xproject_app/core/pedometer_service.dart';
 import 'package:xproject_app/core/user_context.dart';
 import 'package:xproject_app/repositories/otp_repository.dart';
@@ -19,7 +19,7 @@ Future<void> init() async {
   sl.registerLazySingleton<UserContext>(
       () => UserContextImpl(sharedPreferences: sl()));
 
-  sl.registerLazySingleton<DeviceLocationService>(() => DeviceLocationServiceImpl());
+  sl.registerLazySingleton<DeviceLocationService>(() => DeviceLocationServiceGeolocatorLibImpl());
 
   // sl.registerFactory(() => HealthFactory());
   sl.registerLazySingleton<HealthApiService>(() => HealthApiServiceImpl());

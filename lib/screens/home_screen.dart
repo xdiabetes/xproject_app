@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:health/health.dart';
-import 'package:xproject_app/core/device_location_service.dart';
-import 'package:xproject_app/core/health_api_service.dart';
+import 'package:xproject_app/core/device_location/device_location_service.dart';
+import 'package:xproject_app/core/google_fit/health_api_service.dart';
 import 'package:xproject_app/core/user_context.dart';
 import 'package:xproject_app/injection_container.dart';
 import 'package:collection/collection.dart';

@@ -1,10 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:location/location.dart';
 import 'package:xproject_app/blocs/walking_tracker/walking_tracker_bloc.dart';
-import 'package:xproject_app/core/device_location_service.dart';
-import 'package:xproject_app/core/health_api_service.dart';
+import 'package:xproject_app/core/device_location/device_location_service.dart';
+import 'package:xproject_app/core/device_location/models.dart';
+import 'package:xproject_app/core/google_fit/health_api_service.dart';
 import 'package:xproject_app/core/pedometer_service.dart';
 import 'package:xproject_app/core/user_context.dart';
 import 'package:xproject_app/injection_container.dart';
@@ -25,7 +25,7 @@ class _TrackerBodyState extends State<TrackerBody> {
         trackerRunning = true;
       });
       while(trackerRunning) {
-        LocationData locationData = await sl<DeviceLocationService>().getDeviceLocation();
+        DeviceLocation locationData = await sl<DeviceLocationService>().getDeviceLocation();
         BlocProvider.of<WalkingTrackerBloc>(context).add(
           AddTrackingSnapshot(
             WalkingSnapshot(
