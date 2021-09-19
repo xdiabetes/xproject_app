@@ -53,7 +53,7 @@ class DeviceLocationServiceGeolocatorLibImpl implements DeviceLocationService {
       speed: _locationData.speed,
       speedAccuracy: _locationData.speedAccuracy,
       heading: _locationData.heading,
-      time: _locationData.time,
+      time: _locationData.timestamp != null ? _locationData.timestamp!.millisecond.toDouble() : null,
     );
   }
 

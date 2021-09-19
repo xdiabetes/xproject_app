@@ -24,6 +24,7 @@ class _TrackerBodyState extends State<TrackerBody> {
       setState(() {
         trackerRunning = true;
       });
+      int seconds = 0;
       while(trackerRunning) {
         DeviceLocation locationData = await sl<DeviceLocationService>().getDeviceLocation();
         BlocProvider.of<WalkingTrackerBloc>(context).add(
@@ -39,10 +40,12 @@ class _TrackerBodyState extends State<TrackerBody> {
               speedAccuracy: locationData.speedAccuracy,
               heading: locationData.heading,
               time: locationData.time,
+              logOnServer: seconds % trackerInterval == 0
             )
           ),
         );
-        await Future.delayed(Duration(seconds: 1));
+        await Future.delayed(Duration(seconds: trackerInterval));
+        seconds += 1;
       }
     }
   }
@@ -55,7 +58,7 @@ class _TrackerBodyState extends State<TrackerBody> {
     );
   }
 
-  void stopTracker() async {
+  void stopTracker(WalkingTrackerSession session) async {
     if(trackerRunning) {
       setState(() {
         trackerRunning = false;
@@ -87,6 +90,7 @@ class _TrackerBodyState extends State<TrackerBody> {
         } else if(state is WalkingTrackerSessionState) {
           return Column(
             children: [
+              Text("start time: " + state.walkingTrackerSession.pedometerSteps.toString()),
               Text("pedometerSteps: " + state.walkingTrackerSession.pedometerSteps.toString()),
               Text("healthApiSteps: " + state.walkingTrackerSession.healthApiSteps.toString()),
               Text("speedMetersPerSecond: " + state.walkingTrackerSession.speedMetersPerSecond.toString()),

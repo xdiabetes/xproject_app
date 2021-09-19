@@ -11,6 +11,7 @@ class WalkingSnapshot extends Equatable {
   final double? speedAccuracy; // In meters/second, always 0 on iOS
   final double? heading; // Heading is the horizontal direction of travel of this device, in degrees
   final double? time; // timestamp of the LocationData
+  final bool logOnServer;
 
   WalkingSnapshot({
     required this.healthApiSteps,
@@ -23,6 +24,7 @@ class WalkingSnapshot extends Equatable {
     required this.speedAccuracy,
     required this.heading,
     required this.time,
+    required this.logOnServer,
   });
 
   @override
@@ -38,6 +40,7 @@ class WalkingSnapshot extends Equatable {
     speedAccuracy,
     heading,
     time,
+    logOnServer
   ];
 
   Map<String, dynamic> toJson() {
@@ -52,6 +55,7 @@ class WalkingSnapshot extends Equatable {
       'speedAccuracy': this.speedAccuracy,
       'heading': this.heading,
       'time': this.time,
+      'logOnServer': this.logOnServer,
     };
   }
 
@@ -67,6 +71,7 @@ class WalkingSnapshot extends Equatable {
       speedAccuracy: map['speedAccuracy'] as double,
       heading: map['heading'] as double,
       time: map['time'] as double,
+      logOnServer: map['logOnServer'] as bool
     );
   }
 }
