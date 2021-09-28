@@ -9,9 +9,11 @@ import 'package:xproject_app/core/device_location/device_location_service.dart';
 import 'package:xproject_app/core/device_location/models.dart';
 import 'package:xproject_app/core/google_fit/health_api_service.dart';
 import 'package:xproject_app/core/pedometer/pedometer_service.dart';
+import 'package:xproject_app/core/pedometer/pedometer_service_impl.dart';
 import 'package:xproject_app/core/user_context.dart';
 import 'package:xproject_app/injection_container.dart';
 import 'package:xproject_app/models/walking_tracker_models.dart';
+import 'package:xproject_app/widgets/walking_tracker_prop_value.dart';
 import 'package:xproject_app/widgets/walking_tracker_session_display.dart';
 
 class TrackerBody extends StatefulWidget {
@@ -113,6 +115,10 @@ class _TrackerBodyState extends State<TrackerBody> with AutomaticKeepAliveClient
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              WalkingTrackerPropValue(
+                property: "Status:",
+                value: sl<PedometerService>().getPedestrianStatus(),
+              ),
               TrackerSessionDataDisplay(
                 session: state.walkingTrackerSession
               ),

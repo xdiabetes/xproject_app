@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:xproject_app/models/walking_tracker_models.dart';
 import 'package:intl/intl.dart';
+import 'package:xproject_app/widgets/walking_tracker_prop_value.dart';
 
 class TrackerSessionDataDisplay extends StatelessWidget {
   final WalkingTrackerSession session;
@@ -10,15 +11,9 @@ class TrackerSessionDataDisplay extends StatelessWidget {
   }) : super(key: key);
 
   Widget buildPropValue(String property, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(property),
-          Text(value)
-        ],
-      ),
+    return WalkingTrackerPropValue(
+      property: property,
+      value: value,
     );
   }
 
@@ -26,13 +21,34 @@ class TrackerSessionDataDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        buildPropValue("Start Time:" , DateFormat("yyyy-MM-dd HH:mm").format(session.startDateTime)),
-        buildPropValue("Duration:" , session.durationString),
-        buildPropValue("Pedometer Steps:" , (session.pedometerSteps).toString()),
-        buildPropValue("Health Api Steps:" , session.healthApiSteps.toString()),
-        buildPropValue("Current Speed (MPS):" , session.speedMetersPerSecond.toString()),
-        buildPropValue("Average Speed (MPS):" , session.averageSpeedMetersPerSecond.toString()),
-        buildPropValue("Logged On Server:" , session.syncedWithServer ? "Yes" : "No"),
+        WalkingTrackerPropValue(
+            property: "Start Time:" ,
+            value: DateFormat("yyyy-MM-dd HH:mm").format(session.startDateTime),
+        ),
+        WalkingTrackerPropValue(
+            property: "Duration:" ,
+            value: session.durationString,
+        ),
+        WalkingTrackerPropValue(
+            property: "Pedometer Steps:" ,
+            value: (session.pedometerSteps).toString(),
+        ),
+        WalkingTrackerPropValue(
+            property: "Health Api Steps:" ,
+            value: session.healthApiSteps.toString(),
+        ),
+        WalkingTrackerPropValue(
+            property: "Current Speed (MPS):" ,
+            value: session.speedMetersPerSecond.toString(),
+        ),
+        WalkingTrackerPropValue(
+            property: "Average Speed (MPS):" ,
+            value: session.averageSpeedMetersPerSecond.toString(),
+        ),
+        WalkingTrackerPropValue(
+            property: "Logged On Server:" ,
+            value: session.syncedWithServer ? "Yes" : "No",
+        ),
         Divider()
       ],
     );

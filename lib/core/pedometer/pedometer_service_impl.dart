@@ -5,6 +5,12 @@ class PedometerServiceImpl extends PedometerService {
   late Stream<StepCount> _stepCountStream;
   late Stream<PedestrianStatus> _pedestrianStatusStream;
   int _steps = 0;
+  String _status = "unknown";
+
+  @override
+  String getPedestrianStatus() {
+    return _status;
+  }
 
   @override
   Future<int> getPedometerSteps() async {
@@ -19,7 +25,7 @@ class PedometerServiceImpl extends PedometerService {
 
   void onPedestrianStatusChanged(PedestrianStatus event) {
     /// Handle status changed
-    String status = event.status;
+    _status = event.status;
     DateTime timeStamp = event.timeStamp;
   }
 
