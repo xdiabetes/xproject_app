@@ -1,8 +1,5 @@
 import 'package:pedometer/pedometer.dart';
-
-abstract class PedometerService {
-  Future<int> getPedometerSteps();
-}
+import 'package:xproject_app/core/pedometer/pedometer_service.dart';
 
 class PedometerServiceImpl extends PedometerService {
   late Stream<StepCount> _stepCountStream;

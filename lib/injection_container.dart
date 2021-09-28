@@ -7,7 +7,9 @@ import 'package:xproject_app/blocs/walking_tracker_session_server_log/walking_tr
 import 'package:xproject_app/core/device_location/device_location_service.dart';
 import 'package:xproject_app/core/device_location/golocator_lib.dart';
 import 'package:xproject_app/core/google_fit/health_api_service.dart';
-import 'package:xproject_app/core/pedometer_service.dart';
+import 'package:xproject_app/core/google_fit/health_api_service_impl.dart';
+import 'package:xproject_app/core/pedometer/pedometer_service.dart';
+import 'package:xproject_app/core/pedometer/pedometer_service_impl.dart';
 import 'package:xproject_app/core/user_context.dart';
 import 'package:xproject_app/repositories/otp_repository.dart';
 

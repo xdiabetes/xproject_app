@@ -6,7 +6,7 @@ import 'package:xproject_app/blocs/walking_tracker_session_server_log/walking_tr
 import 'package:xproject_app/core/device_location/device_location_service.dart';
 import 'package:xproject_app/core/device_location/models.dart';
 import 'package:xproject_app/core/google_fit/health_api_service.dart';
-import 'package:xproject_app/core/pedometer_service.dart';
+import 'package:xproject_app/core/pedometer/pedometer_service.dart';
 import 'package:xproject_app/core/user_context.dart';
 import 'package:xproject_app/injection_container.dart';
 import 'package:xproject_app/models/walking_tracker_models.dart';
@@ -26,10 +26,12 @@ class _TrackerHistoryState extends State<TrackerHistory> {
         },
         builder: (context, state) {
           if(state is WalkingTrackerSessionServerLogState) {
+            final sessionsSorted = List<WalkingTrackerSession>.from(state.sessions);
+            sessionsSorted.sort((a, b) => b.startDateTime.compareTo(a.startDateTime));
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  ...state.sessions.map(
+                  ...sessionsSorted.map(
                     (el) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
                       child: TrackerSessionDataDisplay(

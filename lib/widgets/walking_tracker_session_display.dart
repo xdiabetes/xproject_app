@@ -26,10 +26,6 @@ class TrackerSessionDataDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        buildPropValue("lastloctime",
-        session.snapshotsWithLocation.length > 0 ?
-            session.snapshotsWithLocation.last.locationData!.time.toString()
-            : "unknown"),
         buildPropValue("Start Time:" , DateFormat("yyyy-MM-DD HH:mm").format(session.startDateTime)),
         buildPropValue("Duration:" , session.durationString),
         buildPropValue("Pedometer Steps:" , (session.pedometerSteps).toString()),

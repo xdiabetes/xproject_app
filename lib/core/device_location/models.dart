@@ -9,7 +9,7 @@ class DeviceLocation extends Equatable {
   final double? speed; // In meters/second
   final double? speedAccuracy; // In meters/second, always 0 on iOS
   final double? heading; // Heading is the horizontal direction of travel of this device, in degrees
-  final double? time; // timestamp of the LocationData
+  final DateTime? datetime; // timestamp of the LocationData
 
   const DeviceLocation({
     required this.latitude,
@@ -19,7 +19,7 @@ class DeviceLocation extends Equatable {
     required this.speed,
     required this.speedAccuracy,
     required this.heading,
-    required this.time,
+    required this.datetime,
   });
 
   @override
@@ -31,7 +31,7 @@ class DeviceLocation extends Equatable {
     speed,
     speedAccuracy,
     heading,
-    time
+    datetime
   ];
 
   Map<String, dynamic> toJson() {
@@ -43,7 +43,7 @@ class DeviceLocation extends Equatable {
       'speed': this.speed,
       'speedAccuracy': this.speedAccuracy,
       'heading': this.heading,
-      'time': this.time,
+      'datetime': this.datetime,
     };
   }
 
@@ -56,7 +56,7 @@ class DeviceLocation extends Equatable {
       speed: map['speed'] as double,
       speedAccuracy: map['speedAccuracy'] as double,
       heading: map['heading'] as double,
-      time: map['time'] as double,
+      datetime: map['datetime'] as DateTime,
     );
   }
 }

@@ -39,7 +39,9 @@ class DeviceLocationServiceLocationLibImpl implements DeviceLocationService {
       speed: _locationData.speed,
       speedAccuracy: _locationData.speedAccuracy,
       heading: _locationData.heading,
-      time: _locationData.time,
+      datetime: DateTime.fromMillisecondsSinceEpoch(
+        _locationData.time!.toInt()
+      ),
     );
   }
 
