@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xproject_app/blocs/walking_tracker/walking_tracker_bloc.dart';
@@ -18,38 +20,46 @@ class TrackerBody extends StatefulWidget {
 }
 
 class _TrackerBodyState extends State<TrackerBody> with AutomaticKeepAliveClientMixin<TrackerBody> {
+  Timer? _timer;
+  int _seconds = 0;
+  int trackerInterval = sl<UserContext>().getTrackerInterval();
+  bool get trackerRunning => _timer != null;
+  late WalkingTrackerSession _currentSession;
 
-  // int trackerInterval = sl<UserContext>().getTrackerInterval();
-  int trackerInterval = 2;
-  bool trackerRunning = false;
-  void runTracker(DateTime startDateTime) async {
+  void _getSnapshot() async {
+    bool isOnLogInterval = _seconds % trackerInterval == 0;
+    DeviceLocation? locationData;
+    if(isOnLogInterval){
+      locationData = await sl<DeviceLocationService>().getDeviceLocation();
+    }
+    BlocProvider.of<WalkingTrackerBloc>(context).add(
+      AddTrackingSnapshot(
+        WalkingSnapshot(
+          healthApiSteps: await sl<HealthApiService>().getSteps(_currentSession.startDateTime),
+          pedometerSteps: await sl<PedometerService>().getPedometerSteps(),
+          locationData: locationData,
+          logOnServer: isOnLogInterval
+        )
+      ),
+    );
+  }
+
+  void runTracker(WalkingTrackerSession session) async {
+    _currentSession = session;
     if(!trackerRunning) {
+      _seconds = 0;
       setState(() {
-        trackerRunning = true;
-      });
-      int seconds = 0;
-      while(trackerRunning) {
-        bool isOnLogInterval = seconds % trackerInterval == 0;
-        DeviceLocation? locationData;
-        if(isOnLogInterval){
-          locationData = await sl<DeviceLocationService>().getDeviceLocation();
-        }
-        BlocProvider.of<WalkingTrackerBloc>(context).add(
-          AddTrackingSnapshot(
-            WalkingSnapshot(
-              healthApiSteps: await sl<HealthApiService>().getSteps(startDateTime),
-              pedometerSteps: await sl<PedometerService>().getPedometerSteps(),
-              locationData: locationData,
-              logOnServer: isOnLogInterval
-            )
-          ),
+        _timer = Timer.periodic(
+          const Duration(seconds: 1),
+          (timer) async {
+            _getSnapshot();
+            _seconds += 1;
+          },
         );
-        await Future.delayed(Duration(seconds: 1));
-        seconds += 1;
-      }
+      });
     }
   }
-  
+
   void initiateTracking() async {
     BlocProvider.of<WalkingTrackerBloc>(context).add(
         StartTrackingSession(
@@ -57,15 +67,23 @@ class _TrackerBodyState extends State<TrackerBody> with AutomaticKeepAliveClient
       ),
     );
   }
-
+  void _stopTrackerTimer() {
+    setState(() {
+      _seconds = 0;
+      if(_timer != null) {
+        _timer!.cancel();
+        _timer = null;
+      }
+    });
+  }
   void stopTracker(WalkingTrackerSession session) async {
     if(trackerRunning) {
-      setState(() {
-        trackerRunning = false;
-      });
+      _getSnapshot();
+      _stopTrackerTimer();
       BlocProvider.of<WalkingTrackerSessionServerLogBloc>(context).add(
         AddWalkingTrackerSession(session.copyWith(
-          endDateTime: DateTime.now()
+          endDateTime: DateTime.now(),
+          snapshots: session.snapshotsWithLocation
         ))
       );
       BlocProvider.of<WalkingTrackerBloc>(context).add(
@@ -81,7 +99,7 @@ class _TrackerBodyState extends State<TrackerBody> with AutomaticKeepAliveClient
       listener: (context, state) {
         if(state is WalkingTrackerSessionState) {
           if(state.runTracker) {
-            runTracker(state.walkingTrackerSession.startDateTime);
+            runTracker(state.walkingTrackerSession);
           }
         }
       },
@@ -117,7 +135,7 @@ class _TrackerBodyState extends State<TrackerBody> with AutomaticKeepAliveClient
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                onPressed: () => runTracker(session.startDateTime),
+                onPressed: () => runTracker(session),
                 child: Text("Resume"),
               ),
             ),
@@ -154,14 +172,9 @@ class _TrackerBodyState extends State<TrackerBody> with AutomaticKeepAliveClient
   bool get wantKeepAlive => trackerRunning;
 
   @override
-  void initState() {
-    super.initState();
-    print('TrackerBody initState');
+  void dispose() {
+    _stopTrackerTimer();
+    super.dispose();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    print("TrackerBody dispose");
-  }
 }

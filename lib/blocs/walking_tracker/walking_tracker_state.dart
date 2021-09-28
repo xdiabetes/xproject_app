@@ -31,9 +31,15 @@ class WalkingTrackerSessionState extends WalkingTrackerState {
   ];
 
   factory WalkingTrackerSessionState.initial(int pedometerStepsBeforeSession){
+    final now = DateTime.now();
     return WalkingTrackerSessionState(
       walkingTrackerSession: WalkingTrackerSession(
-        startDateTime: DateTime.now(),
+        startDateTime: now.subtract(
+          Duration(
+            microseconds: now.microsecond,
+            milliseconds: now.millisecond,
+          ),
+        ),
         snapshots: [],
         pedometerStepsBeforeSession: pedometerStepsBeforeSession,
       )

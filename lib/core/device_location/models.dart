@@ -1,5 +1,6 @@
 
 import 'package:equatable/equatable.dart';
+import 'package:xproject_app/core/date_time_utils.dart';
 
 class DeviceLocation extends Equatable {
   final double? latitude; // Latitude, in degrees
@@ -41,9 +42,9 @@ class DeviceLocation extends Equatable {
       'accuracy': this.accuracy,
       'altitude': this.altitude,
       'speed': this.speed,
-      'speedAccuracy': this.speedAccuracy,
+      'speed_accuracy': this.speedAccuracy,
       'heading': this.heading,
-      'datetime': this.datetime,
+      'datetime': DateTimeUtils.dateTimeToJsonOrNull(this.datetime),
     };
   }
 
@@ -54,9 +55,16 @@ class DeviceLocation extends Equatable {
       accuracy: map['accuracy'] as double,
       altitude: map['altitude'] as double,
       speed: map['speed'] as double,
-      speedAccuracy: map['speedAccuracy'] as double,
+      speedAccuracy: map['speed_accuracy'] as double,
       heading: map['heading'] as double,
-      datetime: map['datetime'] as DateTime,
+      datetime: DateTimeUtils.dateTimeFromJsonOrNull(map['datetime']),
     );
+  }
+
+  static DeviceLocation? fromJsonOrNull(Map<String, dynamic>? map) {
+    if(map != null) {
+      return DeviceLocation.fromJson(map);
+    }
+    return null;
   }
 }

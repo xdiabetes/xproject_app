@@ -53,12 +53,12 @@ class HealthApiServiceImpl extends HealthApiService {
       // print the results
       _healthDataList.forEach((x) {
         if(x.type == HealthDataType.STEPS) {
-          print("Data point: $x");
+          // print("Data point: $x");
           steps += x.value.round();
         }
       });
 
-      print("Steps: $steps");
+      // print("Steps: $steps");
 
       // update the UI to display the results
       // setState(() {

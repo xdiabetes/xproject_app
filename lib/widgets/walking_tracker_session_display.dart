@@ -26,7 +26,7 @@ class TrackerSessionDataDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        buildPropValue("Start Time:" , DateFormat("yyyy-MM-DD HH:mm").format(session.startDateTime)),
+        buildPropValue("Start Time:" , DateFormat("yyyy-MM-dd HH:mm").format(session.startDateTime)),
         buildPropValue("Duration:" , session.durationString),
         buildPropValue("Pedometer Steps:" , (session.pedometerSteps).toString()),
         buildPropValue("Health Api Steps:" , session.healthApiSteps.toString()),

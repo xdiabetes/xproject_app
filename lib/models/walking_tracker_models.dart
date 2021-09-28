@@ -1,18 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:xproject_app/core/date_time_utils.dart';
 import 'package:xproject_app/core/device_location/models.dart';
-
-
-DateTime? dateTimeFromJson(String? json) {
-  if(json == null) {
-    return null;
-  }
-  if (json.contains(".")) {
-    json = json.substring(0, json.length - 1);
-  }
-  return DateTime.parse(json);
-}
-
-String dateTimeToJson(DateTime json) => json.toIso8601String();
 
 class WalkingSnapshot extends Equatable {
   final int healthApiSteps;
@@ -45,7 +33,7 @@ class WalkingSnapshot extends Equatable {
       'location_data': this.locationData != null ?
           this.locationData!.toJson() : null,
       'log_on_server': this.logOnServer,
-      'datetime': this.datetime.toIso8601String(),
+      'datetime': DateTimeUtils.dateTimeToJson(this.datetime),
     };
   }
 
@@ -53,10 +41,9 @@ class WalkingSnapshot extends Equatable {
     return WalkingSnapshot(
       healthApiSteps: map['health_api_steps'] as int,
       pedometerSteps: map['pedometer_steps'] as int,
-      locationData: (map.containsKey('location_data') && map['location_data'] != null) ?
-        DeviceLocation.fromJson(map['location_data']) : null,
+      locationData: DeviceLocation.fromJsonOrNull(map['location_data']),
       logOnServer: map['log_on_server'] as bool,
-      datetime: dateTimeFromJson(map['datetime'])!,
+      datetime: DateTimeUtils.dateTimeFromJson(map['datetime']),
     );
   }
 }
@@ -75,7 +62,7 @@ class WalkingTrackerSession extends Equatable{
     return snapshots.where((element) => element.locationData != null).toList();
   }
   double get averageSpeedMetersPerSecond {
-    return snapshotsWithLocation.length > 0 ? snapshotsWithLocation.map((m) => (m.locationData!.speed ?? 0)).reduce((a, b) => a + b) / snapshots.length : 0;
+    return snapshotsWithLocation.length > 0 ? snapshotsWithLocation.map((m) => (m.locationData!.speed ?? 0)).reduce((a, b) => a + b) / snapshotsWithLocation.length : 0;
   }
 
   double get speedMetersPerSecond {
@@ -131,10 +118,10 @@ class WalkingTrackerSession extends Equatable{
   Map<String, dynamic> toJson() {
     return {
       'snapshots': this.snapshots.map((snapshot) => snapshot.toJson()).toList(),
-      'pedometerStepsBeforeSession': this.pedometerStepsBeforeSession,
-      'createDateTime': this.startDateTime.toIso8601String(),
-      'endDateTime': this.endDateTime != null ? this.endDateTime!.toIso8601String() : null,
-      'syncedWithServer': this.syncedWithServer,
+      'pedometer_steps_before_session': this.pedometerStepsBeforeSession,
+      'start_date_time': DateTimeUtils.dateTimeToJson(this.startDateTime),
+      'end_date_time': DateTimeUtils.dateTimeToJsonOrNull(this.endDateTime),
+      'synced_with_server': this.syncedWithServer,
     };
   }
 
@@ -143,10 +130,10 @@ class WalkingTrackerSession extends Equatable{
       snapshots: (map['snapshots'] as List<dynamic>)
         .map((snapshotData) => WalkingSnapshot.fromJson(snapshotData))
         .toList().cast<WalkingSnapshot>(),
-      pedometerStepsBeforeSession: map['pedometerStepsBeforeSession'] as int,
-      startDateTime: dateTimeFromJson(map['createDateTime'])!,
-      endDateTime: dateTimeFromJson(map['endDateTime']),
-      syncedWithServer: map['syncedWithServer'],
+      pedometerStepsBeforeSession: map['pedometer_steps_before_session'] as int,
+      startDateTime: DateTimeUtils.dateTimeFromJson(map['start_date_time']),
+      endDateTime: DateTimeUtils.dateTimeFromJsonOrNull(map['end_date_time']),
+      syncedWithServer: map['synced_with_server'],
     );
   }
 }
