@@ -5,29 +5,55 @@ import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:xproject_app/models/walking_tracker_models.dart';
+import 'package:xproject_app/repositories/walking_tracker_repository.dart';
 
 part 'walking_tracker_session_server_log_event.dart';
 part 'walking_tracker_session_server_log_state.dart';
 
 class WalkingTrackerSessionServerLogBloc extends HydratedBloc<WalkingTrackerSessionServerLogEvent, WalkingTrackerSessionServerLogState> {
-  WalkingTrackerSessionServerLogBloc() : super(WalkingTrackerSessionServerLogState.initial());
+  WalkingTrackerRepository walkingTrackerRepository;
+
+  WalkingTrackerSessionServerLogBloc({
+    required this.walkingTrackerRepository,
+  }) : super(WalkingTrackerSessionServerLogState.initial()) {
+    add(SyncSessionsWithServer());
+  }
 
   @override
   Stream<WalkingTrackerSessionServerLogState> mapEventToState(
     WalkingTrackerSessionServerLogEvent event,
   ) async* {
+    final sessions = List<WalkingTrackerSession>.from(state.sessions);
     if (event is AddWalkingTrackerSession) {
-      final sessions = List<WalkingTrackerSession>.from(state.sessions);
-      if(event is AddWalkingTrackerSession) {
-        sessions.add(event.session);
-      }
-      for(var i = 0; i < sessions.length; i++) {
-        // TODO send sessions to server
-      }
-      yield WalkingTrackerSessionServerLogState(sessions: sessions);
+      sessions.add(event.session);
+      yield* _mapSyncSessionsWithServerToState(sessions);
+    } else if (event is SyncSessionsWithServer) {
+      yield* _mapSyncSessionsWithServerToState(sessions);
     }
   }
 
+
+  Stream<WalkingTrackerSessionServerLogState> _mapSyncSessionsWithServerToState(
+    List<WalkingTrackerSession> copyOfSessions
+  ) async* {
+    for(int i = 0; i < copyOfSessions.length; i++) {
+      final session = copyOfSessions[i];
+      if(!session.syncedWithServer) {
+        bool syncedWithServer = false;
+        try {
+          await walkingTrackerRepository.createSession(session);
+          syncedWithServer = true;
+        } catch (err) {
+          print("walkingTrackerRepository.createSession err");
+          print(err);
+        }
+        copyOfSessions[i] = session.copyWith(
+          syncedWithServer: syncedWithServer
+        );
+      }
+    }
+    yield WalkingTrackerSessionServerLogState(sessions: copyOfSessions);
+  }
 
   @override
   WalkingTrackerSessionServerLogState? fromJson(Map<String, dynamic> json) {

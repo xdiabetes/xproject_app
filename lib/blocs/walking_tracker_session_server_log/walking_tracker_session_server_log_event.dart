@@ -16,8 +16,8 @@ class AddWalkingTrackerSession extends WalkingTrackerSessionServerLogEvent {
   ];
 }
 
-class SyncSessions extends WalkingTrackerSessionServerLogEvent {
-  const SyncSessions();
+class SyncSessionsWithServer extends WalkingTrackerSessionServerLogEvent {
+  const SyncSessionsWithServer();
 
   @override
   List<Object?> get props => [];

@@ -16,7 +16,7 @@ class OtpRepositoryImpl extends OtpRepository {
     final response = await http.post(Uri.parse(
         HttpHelper.apiUrl + 'api/v1/user_profile/send-code/?format=json'),
                   body: request.toJson());
-    if (HttpHelper.isTypicalHttpSuccess(HttpStatus.created)) {
+    if (HttpHelper.isTypicalHttpSuccess(response.statusCode)) {
       return OtpSendCodeResponse.fromJson(jsonDecode(response.body));
     } else {
       //TODO: handle api errors

@@ -22,11 +22,11 @@ class TrackerBody extends StatefulWidget {
 class _TrackerBodyState extends State<TrackerBody> with AutomaticKeepAliveClientMixin<TrackerBody> {
   Timer? _timer;
   int _seconds = 0;
-  int trackerInterval = sl<UserContext>().getTrackerInterval();
+  int trackerInterval = 1;
   bool get trackerRunning => _timer != null;
   late WalkingTrackerSession _currentSession;
 
-  void _getSnapshot() async {
+  Future<void> _getSnapshot() async {
     bool isOnLogInterval = _seconds % trackerInterval == 0;
     DeviceLocation? locationData;
     if(isOnLogInterval){
@@ -76,15 +76,18 @@ class _TrackerBodyState extends State<TrackerBody> with AutomaticKeepAliveClient
       }
     });
   }
+
   void stopTracker(WalkingTrackerSession session) async {
     if(trackerRunning) {
-      _getSnapshot();
+      await _getSnapshot();
       _stopTrackerTimer();
       BlocProvider.of<WalkingTrackerSessionServerLogBloc>(context).add(
-        AddWalkingTrackerSession(session.copyWith(
-          endDateTime: DateTime.now(),
-          snapshots: session.snapshotsWithLocation
-        ))
+        AddWalkingTrackerSession(
+          session.copyWith(
+            endDateTime: DateTime.now(),
+            snapshots: session.snapshotsWithLocation
+          ),
+        )
       );
       BlocProvider.of<WalkingTrackerBloc>(context).add(
         StopTrackingSession(),

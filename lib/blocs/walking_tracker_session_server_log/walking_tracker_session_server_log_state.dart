@@ -4,7 +4,7 @@ part of 'walking_tracker_session_server_log_bloc.dart';
 class WalkingTrackerSessionServerLogState {
   final List<WalkingTrackerSession> sessions;
 
-  WalkingTrackerSessionServerLogState({
+  const WalkingTrackerSessionServerLogState({
     required this.sessions,
   });
 

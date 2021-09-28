@@ -12,6 +12,7 @@ import 'package:xproject_app/core/pedometer/pedometer_service.dart';
 import 'package:xproject_app/core/pedometer/pedometer_service_impl.dart';
 import 'package:xproject_app/core/user_context.dart';
 import 'package:xproject_app/repositories/otp_repository.dart';
+import 'package:xproject_app/repositories/walking_tracker_repository.dart';
 
 final sl = GetIt.instance;
 
@@ -39,6 +40,15 @@ Future<void> init() async {
     userContext: sl()
   ));
   sl.registerLazySingleton<WalkingTrackerBloc>(() => WalkingTrackerBloc());
-  sl.registerLazySingleton<WalkingTrackerSessionServerLogBloc>(
-          () => WalkingTrackerSessionServerLogBloc());
+
+  sl.registerLazySingleton<WalkingTrackerRepository>(() =>
+    WalkingTrackerRepositoryImpl(
+      userContext: sl()
+    ),
+  );
+  sl.registerSingleton<WalkingTrackerSessionServerLogBloc>(
+    WalkingTrackerSessionServerLogBloc(
+      walkingTrackerRepository: sl()
+    )
+  );
 }
