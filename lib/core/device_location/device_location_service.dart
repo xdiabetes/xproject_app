@@ -16,7 +16,7 @@ class MockDeviceLocationService implements DeviceLocationService {
 
   @override
   Future<DeviceLocation> getDeviceLocation() async {
-    DeviceLocation _locationData = new DeviceLocation.fromMap({
+    DeviceLocation _locationData = new DeviceLocation.fromJson({
       'latitude': double.parse(dotenv.get('MOCK_LOCATION_LAT', fallback: '53.367024331403826')),
       'longitude': double.parse(dotenv.get('MOCK_LOCATION_LON', fallback: '-1.489205076229423'))
     });

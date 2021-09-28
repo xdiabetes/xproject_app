@@ -34,7 +34,7 @@ class DeviceLocation extends Equatable {
     time
   ];
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'latitude': this.latitude,
       'longitude': this.longitude,
@@ -47,7 +47,7 @@ class DeviceLocation extends Equatable {
     };
   }
 
-  factory DeviceLocation.fromMap(Map<String, dynamic> map) {
+  factory DeviceLocation.fromJson(Map<String, dynamic> map) {
     return DeviceLocation(
       latitude: map['latitude'] as double,
       longitude: map['longitude'] as double,

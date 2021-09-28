@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xproject_app/blocs/authentication/authentication_bloc.dart';
 import 'package:xproject_app/blocs/otp/otp_bloc.dart';
 import 'package:xproject_app/blocs/walking_tracker/walking_tracker_bloc.dart';
+import 'package:xproject_app/blocs/walking_tracker_session_server_log/walking_tracker_session_server_log_bloc.dart';
 import 'package:xproject_app/core/device_location/device_location_service.dart';
 import 'package:xproject_app/core/device_location/golocator_lib.dart';
 import 'package:xproject_app/core/google_fit/health_api_service.dart';
@@ -36,4 +37,6 @@ Future<void> init() async {
     userContext: sl()
   ));
   sl.registerLazySingleton<WalkingTrackerBloc>(() => WalkingTrackerBloc());
+  sl.registerLazySingleton<WalkingTrackerSessionServerLogBloc>(
+          () => WalkingTrackerSessionServerLogBloc());
 }

@@ -50,7 +50,8 @@ class WalkingTrackerBloc extends HydratedBloc<WalkingTrackerEvent, WalkingTracke
   @override
   Map<String, dynamic>? toJson(WalkingTrackerState state) {
     if(state is WalkingTrackerSessionState) {
-      return state.walkingTrackerSession.toJson();
+      final walkingTrackerSessionJson = state.walkingTrackerSession.toJson();
+      return walkingTrackerSessionJson;
     } else {
       return {};
     }

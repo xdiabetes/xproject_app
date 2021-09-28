@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xproject_app/blocs/walking_tracker/walking_tracker_bloc.dart';
+import 'package:xproject_app/blocs/walking_tracker_session_server_log/walking_tracker_session_server_log_bloc.dart';
 import 'package:xproject_app/core/device_location/device_location_service.dart';
 import 'package:xproject_app/core/device_location/models.dart';
 import 'package:xproject_app/core/google_fit/health_api_service.dart';
@@ -9,15 +10,17 @@ import 'package:xproject_app/core/pedometer_service.dart';
 import 'package:xproject_app/core/user_context.dart';
 import 'package:xproject_app/injection_container.dart';
 import 'package:xproject_app/models/walking_tracker_models.dart';
+import 'package:xproject_app/widgets/walking_tracker_session_display.dart';
 
 class TrackerBody extends StatefulWidget {
   @override
   _TrackerBodyState createState() => _TrackerBodyState();
 }
 
-class _TrackerBodyState extends State<TrackerBody> {
+class _TrackerBodyState extends State<TrackerBody> with AutomaticKeepAliveClientMixin<TrackerBody> {
 
-  int trackerInterval = sl<UserContext>().getTrackerInterval();
+  // int trackerInterval = sl<UserContext>().getTrackerInterval();
+  int trackerInterval = 2;
   bool trackerRunning = false;
   void runTracker(DateTime startDateTime) async {
     if(!trackerRunning) {
@@ -26,25 +29,22 @@ class _TrackerBodyState extends State<TrackerBody> {
       });
       int seconds = 0;
       while(trackerRunning) {
-        DeviceLocation locationData = await sl<DeviceLocationService>().getDeviceLocation();
+        bool isOnLogInterval = seconds % trackerInterval == 0;
+        DeviceLocation? locationData;
+        if(isOnLogInterval){
+          locationData = await sl<DeviceLocationService>().getDeviceLocation();
+        }
         BlocProvider.of<WalkingTrackerBloc>(context).add(
           AddTrackingSnapshot(
             WalkingSnapshot(
               healthApiSteps: await sl<HealthApiService>().getSteps(startDateTime),
               pedometerSteps: await sl<PedometerService>().getPedometerSteps(),
-              latitude: locationData.latitude,
-              longitude: locationData.longitude,
-              accuracy: locationData.accuracy,
-              altitude: locationData.altitude,
-              speed: locationData.speed,
-              speedAccuracy: locationData.speedAccuracy,
-              heading: locationData.heading,
-              time: locationData.time,
-              logOnServer: seconds % trackerInterval == 0
+              locationData: locationData,
+              logOnServer: isOnLogInterval
             )
           ),
         );
-        await Future.delayed(Duration(seconds: trackerInterval));
+        await Future.delayed(Duration(seconds: 1));
         seconds += 1;
       }
     }
@@ -63,6 +63,11 @@ class _TrackerBodyState extends State<TrackerBody> {
       setState(() {
         trackerRunning = false;
       });
+      BlocProvider.of<WalkingTrackerSessionServerLogBloc>(context).add(
+        AddWalkingTrackerSession(session.copyWith(
+          endDateTime: DateTime.now()
+        ))
+      );
       BlocProvider.of<WalkingTrackerBloc>(context).add(
         StopTrackingSession(),
       );
@@ -71,6 +76,7 @@ class _TrackerBodyState extends State<TrackerBody> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BlocConsumer<WalkingTrackerBloc, WalkingTrackerState>(
       listener: (context, state) {
         if(state is WalkingTrackerSessionState) {
@@ -81,32 +87,17 @@ class _TrackerBodyState extends State<TrackerBody> {
       },
       builder: (context, state) {
         if(state is WalkingTrackerInitial) {
-          return Center(
-            child: ElevatedButton(
-              onPressed: () => initiateTracking(),
-              child: Text("Start"),
-            ),
-          );
+          return buildStartTrackerButton();
         } else if(state is WalkingTrackerSessionState) {
           return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("start time: " + state.walkingTrackerSession.pedometerSteps.toString()),
-              Text("pedometerSteps: " + state.walkingTrackerSession.pedometerSteps.toString()),
-              Text("healthApiSteps: " + state.walkingTrackerSession.healthApiSteps.toString()),
-              Text("speedMetersPerSecond: " + state.walkingTrackerSession.speedMetersPerSecond.toString()),
-              Text("averageSpeedMetersPerSecond: " + state.walkingTrackerSession.averageSpeedMetersPerSecond.toString()),
-              trackerRunning ? SizedBox.shrink() : Center(
-                child: ElevatedButton(
-                  onPressed: () => runTracker(state.walkingTrackerSession.startDateTime),
-                  child: Text("Resume"),
-                ),
+              TrackerSessionDataDisplay(
+                session: state.walkingTrackerSession
               ),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () => stopTracker(),
-                  child: Text("Stop"),
-                ),
-              )
+              buildTrackerActions(
+                state.walkingTrackerSession
+              ),
             ],
           );
         } else {
@@ -116,4 +107,61 @@ class _TrackerBodyState extends State<TrackerBody> {
     );
   }
 
+  Widget buildTrackerActions(WalkingTrackerSession session) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          trackerRunning ? SizedBox.shrink() : Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () => runTracker(session.startDateTime),
+                child: Text("Resume"),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () => stopTracker(session),
+                child: Text("Stop"),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget buildStartTrackerButton() {
+    return Center(
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16.0),
+        child: ElevatedButton(
+          onPressed: () => initiateTracking(),
+          child: Text("Start"),
+        ),
+      ),
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => trackerRunning;
+
+  @override
+  void initState() {
+    super.initState();
+    print('TrackerBody initState');
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    print("TrackerBody dispose");
+  }
 }

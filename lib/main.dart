@@ -6,6 +6,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:xproject_app/blocs/authentication/authentication_bloc.dart';
 import 'package:xproject_app/blocs/otp/otp_bloc.dart';
 import 'package:xproject_app/blocs/walking_tracker/walking_tracker_bloc.dart';
+import 'package:xproject_app/blocs/walking_tracker_session_server_log/walking_tracker_session_server_log_bloc.dart';
 import 'package:xproject_app/core/app_router.dart';
 import 'package:xproject_app/core/http_helper.dart';
 import 'package:xproject_app/injection_container.dart' as di;
@@ -63,6 +64,10 @@ class MyApp extends StatelessWidget {
           BlocProvider<WalkingTrackerBloc>(
             create: (BuildContext context) =>
                 sl<WalkingTrackerBloc>(),
+          ),
+          BlocProvider<WalkingTrackerSessionServerLogBloc>(
+            create: (BuildContext context) =>
+                sl<WalkingTrackerSessionServerLogBloc>(),
           ),
         ],
         child: BlocBuilder<AuthenticationBloc, AuthenticationState>(

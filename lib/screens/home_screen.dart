@@ -8,6 +8,7 @@ import 'package:xproject_app/core/user_context.dart';
 import 'package:xproject_app/injection_container.dart';
 import 'package:collection/collection.dart';
 import 'package:xproject_app/widgets/tracker_body.dart';
+import 'package:xproject_app/widgets/tracker_history.dart';
 
 class HomeScreenPage extends StatefulWidget {
   @override
@@ -41,6 +42,9 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
         await sl<DeviceLocationService>().getDeviceLocation();
         newPermissions[locationPermissionKey] = true;
       }
+      else {
+        throw Exception("Location is off");
+      }
     }
     setState(() {
       permissions = newPermissions;
@@ -48,24 +52,29 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   }
 
   Widget permissionDeniedWidget([String? reason]) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text('Could not get needed permissions, reason: ' + (reason != null ? reason : '')),
-        Container(
-          padding: EdgeInsets.only(top: 8.0),
-          width: double.infinity,
-          child: MaterialButton(
-            color: Colors.white60,
-            onPressed: () {
-              setState(() {
-                requestPermissionsFuture = requestNeededPermissions();
-              });
-            },
-            child: Text('retry'),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Could not get needed permissions, reason: ' + (reason != null ? reason : ''),
+            textAlign: TextAlign.center,
           ),
-        ),
-      ],
+          Container(
+            padding: EdgeInsets.only(top: 8.0),
+            width: double.infinity,
+            child: MaterialButton(
+              color: Colors.white60,
+              onPressed: () {
+                setState(() {
+                  requestPermissionsFuture = requestNeededPermissions();
+                });
+              },
+              child: Text('retry'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -77,28 +86,40 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
           appBar: AppBar(
-            title: const Text('Diabo'),
+            bottom: const TabBar(
+              tabs: [
+                Tab(icon: Text("Tracker")),
+                Tab(icon: Text("History")),
+              ],
+            ),
+            title: const Text('X Project'),
           ),
-          body: FutureBuilder<void>(
-            future: requestPermissionsFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: Text('Requesting Permission...'),
-                );
-              }
-              if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
-              if(!_permissionsGranted) {
-                return permissionDeniedWidget();
-              }
+          body: TabBarView(
+            children: [
+              FutureBuilder<void>(
+                future: requestPermissionsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: Text('Requesting Permission...'),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return permissionDeniedWidget('${snapshot.error}');
+                  }
+                  if(!_permissionsGranted) {
+                    return permissionDeniedWidget();
+                  }
 
-              return TrackerBody();
-            },
+                  return TrackerBody();
+                },
+              ),
+              TrackerHistory(),
+            ],
           ),
       ),
     );
